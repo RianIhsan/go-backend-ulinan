@@ -5,6 +5,7 @@ import (
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"
 	"ulinan/config"
+	hUser "ulinan/domain/user/handler"
 	rUser "ulinan/domain/user/repository"
 	sUser "ulinan/domain/user/service"
 	"ulinan/helper/database"
@@ -40,8 +41,8 @@ func main() {
 	jwt := jwt2.NewJWT(bootConfig.Secret)
 
 	userRepo := rUser.NewUserRepository(db)
-	userService := sUser.NewUserService(userRepo)
-	// userHandler := hUser.NewUserHandler(userService)
+	userService := sUser.NewUserService(userRepo, hash)
+	userHandler := hUser.NewUserHandler(userService)
 
 	authRepo := rAuth.NewAuthRepository(db)
 	authService := sAuth.NewAuthService(authRepo, userService, hash, jwt)
@@ -55,6 +56,7 @@ func main() {
 	})
 
 	routes.BootAuthRoute(app, authHandler)
+	routes.BootUserRoute(app, userHandler, jwt, userService)
 	addr := fmt.Sprintf(":%d", bootConfig.AppPort)
 	app.Listen(addr)
 }
