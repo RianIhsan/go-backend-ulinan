@@ -2,6 +2,7 @@ package repository
 
 import (
 	"gorm.io/gorm"
+	"strings"
 	"time"
 	"ulinan/domain/category"
 	"ulinan/entities"
@@ -74,9 +75,11 @@ func (r *CategoryRepository) FindByName(page, perPage int, name string) ([]*enti
 	var categories []*entities.CategoryEntity
 	offset := (page - 1) * perPage
 	query := r.db.Offset(offset).Limit(perPage).Where("deleted_at IS NULL")
+
 	if name != "" {
-		query = query.Where("name LIKE ?", "%"+name+"%")
+		query = query.Where("LOWER(name) LIKE ?", "%"+strings.ToLower(name)+"%")
 	}
+
 	err := query.Find(&categories).Error
 	if err != nil {
 		return nil, err

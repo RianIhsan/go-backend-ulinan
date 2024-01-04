@@ -2,6 +2,7 @@ package repository
 
 import (
 	"gorm.io/gorm"
+	"strings"
 	"time"
 	"ulinan/domain/product"
 	"ulinan/entities"
@@ -55,7 +56,7 @@ func (r *ProductRepository) FindProductByName(page, perPage int, name string) ([
 	offset := (page - 1) * perPage
 	query := r.db.Offset(offset).Limit(perPage).Preload("Category").Preload("ProductPhotos").Where("deleted_at IS NULL")
 	if name != "" {
-		query = query.Where("name LIKE ?", "%"+name+"%")
+		query = query.Where("LOWER(name) LIKE ?", "%"+strings.ToLower(name)+"%")
 	}
 	err := query.Find(&products).Error
 	if err != nil {
