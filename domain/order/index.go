@@ -15,6 +15,7 @@ type OrderRepositoryInterface interface {
 	GetOrderById(orderID string) (*entities.OrderEntity, error)
 	CheckTransaction(orderID string) (dto.Status, error)
 	ConfirmPayment(orderID, orderStatus, paymentStatus string) error
+	GetAllOrdersByUserID(userID int) ([]*entities.OrderEntity, error)
 }
 
 type OrderServiceInterface interface {

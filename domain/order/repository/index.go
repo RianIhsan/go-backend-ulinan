@@ -109,3 +109,17 @@ func (r *OrderRepository) ConfirmPayment(orderID, orderStatus, paymentStatus str
 	}
 	return nil
 }
+
+func (r *OrderRepository) GetAllOrdersByUserID(userID int) ([]*entities.OrderEntity, error) {
+	var orders []*entities.OrderEntity
+	if err := r.db.
+		Preload("OrderDetails").
+		Preload("OrderDetails.Product").
+		Preload("OrderDetails.Product.ProductPhotos").
+		Preload("User").
+		Where("user_id = ? AND deleted_at IS NULL", userID).
+		Find(&orders).Error; err != nil {
+		return nil, err
+	}
+	return orders, nil
+}

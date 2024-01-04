@@ -102,7 +102,24 @@ func (h *CategoryHandler) UpdateCategory(c *fiber.Ctx) error {
 		return response.SendStatusBadRequest(c, "invalid payload:"+err.Error())
 	}
 
-	err := h.categoryService.UpdateCategory(id, &payload)
+	file, err := c.FormFile("image")
+	var uploadedURL string
+	if err == nil {
+		fileToUpload, err := file.Open()
+		if err != nil {
+			return response.SendStatusInternalServerError(c, "Failed open to open file: "+err.Error())
+		}
+		defer func(fileToUpload multipart.File) {
+			_ = fileToUpload.Close()
+		}(fileToUpload)
+		uploadedURL, err = cloudinary.Uploader(fileToUpload)
+		if err != nil {
+			return response.SendStatusInternalServerError(c, "Failed to upload image: "+err.Error())
+		}
+	}
+	payload.Image = uploadedURL
+
+	err = h.categoryService.UpdateCategory(id, &payload)
 	if err != nil {
 		return response.SendStatusBadRequest(c, "failed to update category: "+err.Error())
 	}
