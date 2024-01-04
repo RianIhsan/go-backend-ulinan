@@ -78,3 +78,17 @@ func (h *OrderHandler) Callback(c *fiber.Ctx) error {
 
 	return response.SendStatusOkResponse(c, "Berhasil callback")
 }
+
+func (h *OrderHandler) GetAllOrdersByUserID(c *fiber.Ctx) error {
+	currentUser, _ := c.Locals("CurrentUser").(*entities.UserEntity)
+	if currentUser.Role != "user" {
+		return response.SendStatusUnauthorized(c, "Access denied: you are admin, not user")
+	}
+
+	orders, err := h.service.GetAllOrdersByUserID(currentUser.ID)
+	if err != nil {
+		return response.SendStatusInternalServerError(c, "Gagal mendapatkan pesanan: "+err.Error())
+	}
+
+	return response.SendStatusOkWithDataResponse(c, "Berhasil mendapatkan pesanan", dto.FormatterGetAllOrderUser(orders))
+}

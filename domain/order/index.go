@@ -25,9 +25,11 @@ type OrderServiceInterface interface {
 	SendNotificationPayment(request dto.SendNotificationPaymentRequest) (string, error)
 	CancelPayment(orderID string) error
 	CallBack(notifPayload map[string]interface{}) error
+	GetAllOrdersByUserID(userID int) ([]*entities.OrderEntity, error)
 }
 
 type OrderHandlerInterface interface {
 	CreateOrder(c *fiber.Ctx) error
+	GetAllOrdersByUserID(c *fiber.Ctx) error
 	Callback(c *fiber.Ctx) error
 }

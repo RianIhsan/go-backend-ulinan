@@ -86,6 +86,10 @@ func (s *OrderService) CreateOrder(userID int, request *dto.TCreateOrderRequest,
 			return nil, errors.New("failed to delete cart")
 		}
 	}
+	arrivalDate, err := time.Parse("2006-01-02", request.ArrivalDate)
+	if err != nil {
+		return nil, errors.New("invalid arrival date format")
+	}
 	newData := &entities.OrderEntity{
 		Id:                 orderID,
 		IdOrder:            idOrder,
@@ -96,6 +100,7 @@ func (s *OrderService) CreateOrder(userID int, request *dto.TCreateOrderRequest,
 		OrderStatus:        "Menunggu Konfirmasi",
 		PaymentStatus:      "Menunggu Konfirmasi",
 		PaymentMethod:      request.PaymentMethod,
+		ArrivalDate:        arrivalDate,
 		CreatedAt:          time.Now(),
 		OrderDetails:       orderDetails,
 	}
@@ -243,4 +248,17 @@ func (s *OrderService) CallBack(notifPayload map[string]interface{}) error {
 	}
 
 	return nil
+}
+
+func (s *OrderService) GetAllOrdersByUserID(userID int) ([]*entities.OrderEntity, error) {
+	user, err := s.userService.GetId(userID)
+	if err != nil {
+		return nil, errors.New("user not found")
+	}
+
+	orders, err := s.repo.GetAllOrdersByUserID(user.ID)
+	if err != nil {
+		return nil, nil
+	}
+	return orders, nil
 }

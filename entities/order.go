@@ -12,6 +12,7 @@ type OrderEntity struct {
 	OrderStatus        string               `gorm:"column:order_status;type:VARCHAR(255)" json:"order_status"`
 	PaymentStatus      string               `gorm:"column:payment_status;type:VARCHAR(255)" json:"payment_status"`
 	PaymentMethod      string               `gorm:"column:payment_method;type:VARCHAR(255)" json:"payment_method"`
+	ArrivalDate        time.Time            `gorm:"column:arrival_date;type:TIMESTAMP" json:"arrival_date,omitempty"`
 	CreatedAt          time.Time            `gorm:"column:created_at;type:TIMESTAMP" json:"created_at"`
 	UpdatedAt          time.Time            `gorm:"column:updated_at;type:TIMESTAMP" json:"updated_at"`
 	DeletedAt          *time.Time           `gorm:"column:deleted_at;type:TIMESTAMP NULL;index" json:"deleted_at"`

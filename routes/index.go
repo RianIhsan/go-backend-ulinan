@@ -49,4 +49,5 @@ func BootOrderRouter(app *fiber.App, handler order.OrderHandlerInterface, jwtSer
 	orderGroup := app.Group("api/order")
 	orderGroup.Post("/", middleware.Protected(jwtService, userService), handler.CreateOrder)
 	orderGroup.Post("/callback", handler.Callback)
+	orderGroup.Get("/user", middleware.Protected(jwtService, userService), handler.GetAllOrdersByUserID)
 }

@@ -1,9 +1,9 @@
 package dto
 
 type TCreateOrderRequest struct {
-	ProductID int `json:"product_id" validate:"required"`
-	Quantity  int `json:"quantity" validate:"required"`
-
+	ProductID     int    `json:"product_id" validate:"required"`
+	Quantity      int    `json:"quantity" validate:"required"`
+	ArrivalDate   string `json:"arrival_date" validate:"required"`
 	PaymentMethod string `json:"payment_method" validate:"required"`
 }
 
