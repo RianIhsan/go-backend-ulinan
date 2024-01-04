@@ -68,12 +68,12 @@ func (u userHandler) UpdateUser(c *fiber.Ctx) error {
 		return response.SendStatusUnauthorized(c, "User not found")
 	}
 
-	var request dto.TUpdateUserRequest
+	var request *dto.TUpdateUserRequest
 	if err := c.BodyParser(&request); err != nil {
 		return response.SendStatusBadRequest(c, "Invalid request format")
 	}
 
-	_, err := u.userService.UpdateUser(currentUser.ID, &request)
+	_, err := u.userService.UpdateUser(currentUser.ID, request)
 	if err != nil {
 		log.Fatal(err.Error())
 		return response.SendStatusInternalServerError(c, "Failed to update user information")

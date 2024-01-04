@@ -12,8 +12,11 @@ type UserRepositoryInterface interface {
 	FindUsername(username string) (*entities.UserEntity, error)
 	UpdateUserAvatar(userID int, avatarPath string) error
 	UpdateUser(userUpdate *entities.UserEntity) error
-	UpdateGender(user *entities.UserEntity) (*entities.UserEntity, error)
+	UpdateGender(user *entities.UserEntity) error
 	UpdatePassword(userUpdate *entities.UserEntity) error
+	FindGenderByID(genderID int) (*entities.GenderEntity, error)
+	UpdateUserWithTransaction(user *entities.UserEntity) (*entities.UserEntity, error)
+	UpdateUserGenderWithTransaction(user *entities.UserEntity, genderID int) error
 }
 
 type UserServiceInterface interface {
@@ -23,6 +26,7 @@ type UserServiceInterface interface {
 	UpdateAvatar(userID int, request *dto.TUpdateAvatarRequest) (*entities.UserEntity, error)
 	UpdateUser(userID int, request *dto.TUpdateUserRequest) (*entities.UserEntity, error)
 	UpdatePassword(userID int, request *dto.TUpdatePasswordRequest) error
+	UpdateUserGender(userID int, genderID int) error
 }
 
 type UserHandlerInterface interface {

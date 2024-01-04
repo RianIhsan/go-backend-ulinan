@@ -1,6 +1,7 @@
 package repository
 
 import (
+	"errors"
 	"gorm.io/gorm"
 	"ulinan/domain/user"
 	"ulinan/entities"
@@ -64,14 +65,11 @@ func (r *UserRepository) UpdateUser(userUpdate *entities.UserEntity) error {
 	return nil
 }
 
-func (r *UserRepository) UpdateGender(user *entities.UserEntity) (*entities.UserEntity, error) {
-	result := r.db.Preload("Gender").
-		Where("id = ?", user.ID).
-		Find(&user)
-	if result.Error != nil {
-		return nil, result.Error
+func (r *UserRepository) UpdateGender(user *entities.UserEntity) error {
+	if err := r.db.Save(user).Error; err != nil {
+		return err
 	}
-	return user, nil
+	return nil
 }
 
 func (r *UserRepository) UpdatePassword(userUpdate *entities.UserEntity) error {
@@ -80,4 +78,43 @@ func (r *UserRepository) UpdatePassword(userUpdate *entities.UserEntity) error {
 		return result.Error
 	}
 	return nil
+}
+
+func (r *UserRepository) FindGenderByID(genderID int) (*entities.GenderEntity, error) {
+	var gender entities.GenderEntity
+	if err := r.db.First(&gender, genderID).Error; err != nil {
+		return nil, err
+	}
+	return &gender, nil
+}
+
+func (r *UserRepository) UpdateUserWithTransaction(user *entities.UserEntity) (*entities.UserEntity, error) {
+	tx := r.db.Begin()
+
+	if err := tx.Save(user).Error; err != nil {
+		tx.Rollback()
+		return nil, errors.New("gagal menyimpan user: " + err.Error())
+	}
+
+	return user, tx.Commit().Error
+}
+
+func (r *UserRepository) UpdateUserGenderWithTransaction(user *entities.UserEntity, genderID int) error {
+	tx := r.db.Begin()
+
+	if user.GenderID != nil {
+		// Delete existing gender_id
+		if err := tx.Model(user).UpdateColumn("gender_id", nil).Error; err != nil {
+			tx.Rollback()
+			return errors.New("failed to delete existing gender_id: " + err.Error())
+		}
+	}
+
+	// Set the new gender_id
+	if err := tx.Model(user).Update("gender_id", genderID).Error; err != nil {
+		tx.Rollback()
+		return errors.New("failed to set new gender_id: " + err.Error())
+	}
+
+	return tx.Commit().Error
 }
