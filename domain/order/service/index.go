@@ -110,9 +110,13 @@ func (s *OrderService) CreateOrder(userID int, request *dto.TCreateOrderRequest,
 		return nil, errors.New("user not found")
 	}
 
+	var phone string
+	if user != nil && user.Phone != nil {
+		phone = *user.Phone
+	}
 	switch request.PaymentMethod {
-	case "qris", "bank_transfer", "bca", "bri", "bni", "cimb", "gopay": // Tambahkan bank lain sesuai kebutuhan
-		return s.ProcessGatewayPayment(totalPrice, createdOrder.Id, request.PaymentMethod, user.Username, user.Email, *user.Phone, bank)
+	case "qris", "bank_transfer", "bca", "bri", "bni", "cimb", "gopay":
+		return s.ProcessGatewayPayment(totalPrice, createdOrder.Id, request.PaymentMethod, user.Username, user.Email, phone, bank)
 	default:
 		return nil, errors.New("invalid payment type")
 	}

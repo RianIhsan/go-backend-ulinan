@@ -129,8 +129,10 @@ func (s *UserService) UpdateUser(userID int, request *dto.TUpdateUserRequest) (*
 		userToUpdate.Address = request.Address
 	}
 	if request.GenderID != nil {
-		userToUpdate.Gender.ID = request.GenderID.Id
-		userToUpdate.Gender.Name = request.GenderID.Name
+		if userToUpdate.Gender == nil {
+			userToUpdate.Gender = &entities.GenderEntity{}
+		}
+		userToUpdate.Gender.ID = *request.GenderID
 	}
 
 	err = s.repo.UpdateUser(userToUpdate)

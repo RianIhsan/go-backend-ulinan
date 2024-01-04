@@ -31,8 +31,11 @@ func CreateCoreAPIPaymentRequest(coreClient coreapi.Client, orderID string, tota
 
 	paymentRequest.CustomerDetails = &midtrans.CustomerDetails{
 		FName: name,
-		Phone: phone,
 		Email: email,
+	}
+
+	if phone != "" {
+		paymentRequest.CustomerDetails.Phone = phone
 	}
 
 	resp, err := coreClient.ChargeTransaction(paymentRequest)
