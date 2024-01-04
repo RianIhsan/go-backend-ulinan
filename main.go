@@ -9,15 +9,32 @@ import (
 	rUser "ulinan/domain/user/repository"
 	sUser "ulinan/domain/user/service"
 	"ulinan/helper/database"
+	"ulinan/helper/generator"
 	"ulinan/helper/hashing"
 	jwt2 "ulinan/helper/jwt"
+	"ulinan/helper/payment"
 	"ulinan/middleware"
 	"ulinan/routes"
 
-	// hUser "ulinan/domain/user/handler"
 	hAuth "ulinan/domain/auth/handler"
 	rAuth "ulinan/domain/auth/repository"
 	sAuth "ulinan/domain/auth/service"
+
+	hCategory "ulinan/domain/category/handler"
+	rCategory "ulinan/domain/category/repository"
+	sCategory "ulinan/domain/category/service"
+
+	hProduct "ulinan/domain/product/handler"
+	rProduct "ulinan/domain/product/repository"
+	sProduct "ulinan/domain/product/service"
+
+	rCart "ulinan/domain/cart/repository"
+	sCart "ulinan/domain/cart/service"
+	// hCart "ulinan/domain/cart/handler"
+
+	hOrder "ulinan/domain/order/handler"
+	rOrder "ulinan/domain/order/repository"
+	sOrder "ulinan/domain/order/service"
 )
 
 func main() {
@@ -39,6 +56,8 @@ func main() {
 	database.MigrateTable(db)
 	hash := hashing.NewHash()
 	jwt := jwt2.NewJWT(bootConfig.Secret)
+	coreApi := payment.InitSnapMidtrans(*bootConfig)
+	generatorID := generator.NewGeneratorUUID(db)
 
 	userRepo := rUser.NewUserRepository(db)
 	userService := sUser.NewUserService(userRepo, hash)
@@ -47,6 +66,22 @@ func main() {
 	authRepo := rAuth.NewAuthRepository(db)
 	authService := sAuth.NewAuthService(authRepo, userService, hash, jwt)
 	authHandler := hAuth.NewAuthHandler(authService)
+
+	categoryRepo := rCategory.NewCategoryRepository(db)
+	categoryService := sCategory.NewCategoryService(categoryRepo)
+	categoryHandler := hCategory.NewCategoryHandler(categoryService)
+
+	productRepo := rProduct.NewProductRepository(db)
+	productService := sProduct.NewProductService(productRepo, categoryService)
+	productHandler := hProduct.NewProductHandler(productService)
+
+	cartRepo := rCart.NewCartRepository(db)
+	cartService := sCart.NewCartService(cartRepo, productService)
+	// cartHandler := hCart.NewCartHandler(cartService)
+
+	orderRepo := rOrder.NewOrderRepository(db, coreApi)
+	orderService := sOrder.NewOrderService(orderRepo, generatorID, productService, userService, cartService)
+	orderHandler := hOrder.NewOrderHandler(orderService)
 
 	app.Use(middleware.Logging())
 	app.Get("/", func(c *fiber.Ctx) error {
@@ -57,6 +92,12 @@ func main() {
 
 	routes.BootAuthRoute(app, authHandler)
 	routes.BootUserRoute(app, userHandler, jwt, userService)
+	routes.BootCategoryRoute(app, categoryHandler, jwt, userService)
+	routes.BootProductRouter(app, productHandler, jwt, userService)
+	routes.BootOrderRouter(app, orderHandler, jwt, userService)
+
 	addr := fmt.Sprintf(":%d", bootConfig.AppPort)
-	app.Listen(addr)
+	if err := app.Listen(addr).Error(); err != addr {
+		panic("Appilaction failed to start")
+	}
 }

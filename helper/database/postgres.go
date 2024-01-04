@@ -25,6 +25,13 @@ func MigrateTable(db *gorm.DB) {
 	err := db.AutoMigrate(
 		entities.UserEntity{},
 		entities.GenderEntity{},
+		entities.CategoryEntity{},
+		entities.ProductEntity{},
+		entities.ProductPhotosEntity{},
+		entities.CartEntity{},
+		entities.CartItemEntity{},
+		entities.OrderEntity{},
+		entities.OrderDetailsEntity{},
 	)
 	if err != nil {
 		log.Fatal("Failed to migrate table", err.Error())

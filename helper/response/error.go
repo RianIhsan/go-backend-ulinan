@@ -13,6 +13,20 @@ type GeneralMessageWithData struct {
 	Data    interface{} `json:"data"`
 }
 
+type PaginationMeta struct {
+	CurrentPage int `json:"current_page"`
+	TotalPage   int `json:"total_page"`
+	TotalItems  int `json:"total_items"`
+	NextPage    int `json:"next_page"`
+	PrevPage    int `json:"prev_page"`
+}
+
+type PaginationRes struct {
+	Message string         `json:"message"`
+	Data    interface{}    `json:"data"`
+	Meta    PaginationMeta `json:"meta"`
+}
+
 func GetCurrentUser(c *fiber.Ctx, data interface{}) error {
 	return c.Status(fiber.StatusOK).JSON(data)
 }
@@ -20,6 +34,19 @@ func GetCurrentUser(c *fiber.Ctx, data interface{}) error {
 func SendStatusOkResponse(c *fiber.Ctx, message string) error {
 	return c.Status(fiber.StatusOK).JSON(GeneralMessage{
 		Message: message,
+	})
+}
+
+func SendStatusCreatedResponse(c *fiber.Ctx, message string) error {
+	return c.Status(fiber.StatusCreated).JSON(GeneralMessage{
+		Message: message,
+	})
+}
+
+func SendStatusCreatedWithDataResponse(c *fiber.Ctx, message string, data interface{}) error {
+	return c.Status(fiber.StatusCreated).JSON(GeneralMessageWithData{
+		Message: message,
+		Data:    data,
 	})
 }
 
@@ -57,5 +84,20 @@ func SendStatusUnauthorized(c *fiber.Ctx, message string) error {
 func SendStatusForbidden(c *fiber.Ctx, message string) error {
 	return c.Status(fiber.StatusForbidden).JSON(GeneralMessage{
 		Message: message,
+	})
+}
+
+func SendPaginationResponse(c *fiber.Ctx, data interface{}, currentPage, totalPages, totalItems, nextPage, prevPage int, message string) error {
+	pagination := PaginationMeta{
+		CurrentPage: currentPage,
+		TotalPage:   totalPages,
+		TotalItems:  totalItems,
+		NextPage:    nextPage,
+		PrevPage:    prevPage,
+	}
+	return c.Status(fiber.StatusOK).JSON(PaginationRes{
+		Message: message,
+		Data:    data,
+		Meta:    pagination,
 	})
 }

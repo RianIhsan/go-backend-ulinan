@@ -12,6 +12,7 @@ type Config struct {
 	Secret     string
 	Database   database
 	Cloudinary cloudinary
+	Midtrans   midtrans
 }
 
 type database struct {
@@ -27,6 +28,11 @@ type cloudinary struct {
 	CCAPIKey    string
 	CCAPISecret string
 	CCFolder    string
+}
+
+type midtrans struct {
+	ClientKey string
+	ServerKey string
 }
 
 func loadConfig() *Config {
@@ -91,6 +97,14 @@ func loadConfig() *Config {
 
 	if value, found := os.LookupEnv("CCFOLDER"); found {
 		res.Cloudinary.CCFolder = value
+	}
+
+	if value, found := os.LookupEnv("MIDTRANS_CLIENT_KEY"); found {
+		res.Midtrans.ClientKey = value
+	}
+
+	if value, found := os.LookupEnv("MIDTRANS_SERVER_KEY"); found {
+		res.Midtrans.ServerKey = value
 	}
 
 	return res
