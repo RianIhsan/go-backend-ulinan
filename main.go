@@ -38,6 +38,10 @@ import (
 	hTransaction "ulinan/domain/transaction/handler"
 	rTransaction "ulinan/domain/transaction/repository"
 	sTransaction "ulinan/domain/transaction/service"
+
+	hDashboard "ulinan/domain/dashboard/handler"
+	rDashboard "ulinan/domain/dashboard/repository"
+	sDashboard "ulinan/domain/dashboard/service"
 )
 
 func main() {
@@ -90,6 +94,10 @@ func main() {
 	transactionService := sTransaction.NewTransactionService(transactionRepo)
 	transactionHandler := hTransaction.NewTransactionHandler(transactionService)
 
+	dashboardRepo := rDashboard.NewDashboardRepository(db)
+	dashboardService := sDashboard.NewDashboardService(dashboardRepo)
+	dashboardHandler := hDashboard.NewDashboardHandler(dashboardService)
+
 	app.Use(middleware.Logging())
 	app.Get("/", func(c *fiber.Ctx) error {
 		return c.Status(fiber.StatusOK).JSON(fiber.Map{
@@ -104,6 +112,7 @@ func main() {
 	routes.BootCartRouter(app, cartHandler, jwt, userService)
 	routes.BootOrderRouter(app, orderHandler, jwt, userService)
 	routes.BootTransactionRouter(app, transactionHandler, jwt, userService)
+	routes.BootDashboardRouter(app, dashboardHandler, jwt, userService)
 
 	addr := fmt.Sprintf(":%d", bootConfig.AppPort)
 	if err := app.Listen(addr).Error(); err != addr {

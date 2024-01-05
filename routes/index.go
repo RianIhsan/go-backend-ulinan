@@ -5,6 +5,7 @@ import (
 	"ulinan/domain/auth"
 	"ulinan/domain/cart"
 	"ulinan/domain/category"
+	"ulinan/domain/dashboard"
 	"ulinan/domain/order"
 	"ulinan/domain/product"
 	"ulinan/domain/transaction"
@@ -69,4 +70,9 @@ func BootTransactionRouter(app *fiber.App, handler transaction.TransactionHandle
 	transactionGroup.Get("/:id", middleware.Protected(jwtService, userService), handler.GetTransactionById)
 	transactionGroup.Patch("/:id", middleware.Protected(jwtService, userService), handler.UpdatePaymentStatus)
 	transactionGroup.Delete("/:id", middleware.Protected(jwtService, userService), handler.DeleteTransaction)
+}
+
+func BootDashboardRouter(app *fiber.App, handler dashboard.DashboardHandlerInterface, jwtService jwt.IJwt, userService user.UserServiceInterface) {
+	dashboardGroup := app.Group("api/dashboard")
+	dashboardGroup.Get("/", middleware.Protected(jwtService, userService), handler.GetCardDashboard)
 }

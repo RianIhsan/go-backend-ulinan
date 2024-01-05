@@ -81,6 +81,10 @@ func (s *UserService) UpdatePassword(userID int, request *dto.TUpdatePasswordReq
 		return errors.New("incorrect old password")
 	}
 
+	if request.NewPassword != request.ConfirmPassword {
+		return errors.New("password tidak tidak sesuai")
+	}
+
 	newHashedPassword, err := s.hashing.GenerateHash(request.NewPassword)
 	if err != nil {
 		return errors.New("failed to generate new password hash")
