@@ -1,6 +1,7 @@
 package cart
 
 import (
+	"github.com/gofiber/fiber/v2"
 	"ulinan/domain/cart/dto"
 	"ulinan/entities"
 )
@@ -32,4 +33,9 @@ type CartServiceInterface interface {
 	GetCartItems(cartItem int) (*entities.CartItemEntity, error)
 }
 
-type CartHandlerInterface interface{}
+type CartHandlerInterface interface {
+	AddCartItem(c *fiber.Ctx) error
+	GetCart(c *fiber.Ctx) error
+	ReduceQuantity(c *fiber.Ctx) error
+	DeleteCartItem(c *fiber.Ctx) error
+}

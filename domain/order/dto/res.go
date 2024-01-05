@@ -2,37 +2,51 @@ package dto
 
 import "ulinan/entities"
 
-type ProductResponse struct {
-	ID    int    `json:"id"`
-	Name  string `json:"name"`
-	Price int    `json:"price"`
+type GetAllOrderUserResponse struct {
+	ID              string                 `json:"id"`
+	IdOrder         string                 `json:"id_order"`
+	UserID          int                    `json:"user_id"`
+	GrandTotalPrice int                    `json:"grand_total_price"`
+	TotalQuantity   int                    `json:"total_quantity"`
+	PaymentStatus   string                 `json:"payment_status"`
+	ArrivalDate     string                 `json:"arrival_date"`
+	Products        []OrderProductResponse `json:"products"`
 }
 
-type GetAllOrderUserResponse struct {
-	ID            string `json:"id"`
-	IdOrder       string `json:"id_order"`
-	UserID        int    `json:"user_id"`
-	ProductName   string `json:"product_name"`
-	ArrivalDate   string `json:"arrival_date"`
-	TotalPrice    int    `json:"total_price"`
-	TotalQuantity int    `json:"total_quantity"`
-	PaymentStatus string `json:"payment_status"`
+type OrderProductResponse struct {
+	IDProduct    int    `json:"id_product"`
+	ProductName  string `json:"product_name"`
+	PricePerItem int    `json:"price_per_item"`
+	Quantity     int    `json:"quantity"`
+	TotalPrice   int    `json:"total_price"`
+	ArrivalDate  string `json:"arrival_date"`
 }
 
 func FormatGetAllOrderUser(order *entities.OrderEntity) *GetAllOrderUserResponse {
-	orderResponse := &GetAllOrderUserResponse{}
-	orderResponse.ID = order.Id
-	orderResponse.IdOrder = order.IdOrder
-	orderResponse.UserID = order.UserId
-	orderResponse.ArrivalDate = order.ArrivalDate.Format("02 January 2006")
-	orderResponse.TotalPrice = order.GrandTotalPrice
-	orderResponse.TotalQuantity = order.GrandTotalQuantity
-	orderResponse.PaymentStatus = order.PaymentStatus
-
-	for _, orderDetail := range order.OrderDetails {
-		orderResponse.ProductName = orderDetail.Product.Name
+	orderResponse := &GetAllOrderUserResponse{
+		ID:              order.Id,
+		IdOrder:         order.IdOrder,
+		UserID:          order.UserId,
+		GrandTotalPrice: order.GrandTotalPrice,
+		TotalQuantity:   order.GrandTotalQuantity,
+		PaymentStatus:   order.PaymentStatus,
+		ArrivalDate:     order.ArrivalDate.Format("02 January 2006"),
 	}
 
+	var products []OrderProductResponse
+	for _, orderDetail := range order.OrderDetails {
+		product := OrderProductResponse{
+			IDProduct:    orderDetail.Product.ID,
+			ProductName:  orderDetail.Product.Name,
+			PricePerItem: orderDetail.Product.Price,
+			Quantity:     orderDetail.Quantity,
+			TotalPrice:   orderDetail.TotalPrice,
+			ArrivalDate:  order.ArrivalDate.Format("02 January 2006"),
+		}
+		products = append(products, product)
+	}
+
+	orderResponse.Products = products
 	return orderResponse
 }
 

@@ -12,21 +12,21 @@ func TransactionStatus(transactionStatusResp *coreapi.TransactionStatusResponse)
 			status.PaymentStatus = "challenge"
 			status.OrderStatus = "challenge"
 		} else if transactionStatusResp.FraudStatus == "accept" {
-			status.PaymentStatus = "Konfirmasi"
+			status.PaymentStatus = "Success"
 			status.OrderStatus = "Proses"
 		}
 	} else if transactionStatusResp.TransactionStatus == "settlement" {
-		status.PaymentStatus = "Konfirmasi"
+		status.PaymentStatus = "Success"
 		status.OrderStatus = "Proses"
 	} else if transactionStatusResp.TransactionStatus == "deny" {
 		status.PaymentStatus = "deny"
 		status.OrderStatus = "deny"
 	} else if transactionStatusResp.TransactionStatus == "cancel" || transactionStatusResp.TransactionStatus == "expire" {
-		status.PaymentStatus = "Gagal"
-		status.OrderStatus = "Gagal"
+		status.PaymentStatus = "Failed"
+		status.OrderStatus = "Failed"
 	} else if transactionStatusResp.TransactionStatus == "pending" {
-		status.PaymentStatus = "pending"
-		status.OrderStatus = "pending"
+		status.PaymentStatus = "Pending"
+		status.OrderStatus = "Pending"
 	}
 	return status
 }

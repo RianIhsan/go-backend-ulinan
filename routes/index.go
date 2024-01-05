@@ -3,9 +3,11 @@ package routes
 import (
 	"github.com/gofiber/fiber/v2"
 	"ulinan/domain/auth"
+	"ulinan/domain/cart"
 	"ulinan/domain/category"
 	"ulinan/domain/order"
 	"ulinan/domain/product"
+	"ulinan/domain/transaction"
 	"ulinan/domain/user"
 	"ulinan/helper/jwt"
 	"ulinan/middleware"
@@ -45,9 +47,26 @@ func BootProductRouter(app *fiber.App, handler product.ProductHandlerInterface, 
 	productGroup.Delete("/:productId/image/:imageId", middleware.Protected(jwtService, userService), handler.DeleteProductImage)
 }
 
+func BootCartRouter(app *fiber.App, handler cart.CartHandlerInterface, jwtService jwt.IJwt, userService user.UserServiceInterface) {
+	cartGroup := app.Group("api/cart")
+	cartGroup.Post("/", middleware.Protected(jwtService, userService), handler.AddCartItem)
+	cartGroup.Get("/", middleware.Protected(jwtService, userService), handler.GetCart)
+	cartGroup.Patch("/reduce-quantity", middleware.Protected(jwtService, userService), handler.ReduceQuantity)
+	cartGroup.Delete("/:id", middleware.Protected(jwtService, userService), handler.DeleteCartItem)
+}
+
 func BootOrderRouter(app *fiber.App, handler order.OrderHandlerInterface, jwtService jwt.IJwt, userService user.UserServiceInterface) {
 	orderGroup := app.Group("api/order")
 	orderGroup.Post("/", middleware.Protected(jwtService, userService), handler.CreateOrder)
+	orderGroup.Post("/carts", middleware.Protected(jwtService, userService), handler.CreateOrderFromCart)
 	orderGroup.Post("/callback", handler.Callback)
 	orderGroup.Get("/user", middleware.Protected(jwtService, userService), handler.GetAllOrdersByUserID)
+}
+
+func BootTransactionRouter(app *fiber.App, handler transaction.TransactionHandlerInterface, jwtService jwt.IJwt, userService user.UserServiceInterface) {
+	transactionGroup := app.Group("api/transaction")
+	transactionGroup.Get("/", middleware.Protected(jwtService, userService), handler.GetAllTransactions)
+	transactionGroup.Get("/:id", middleware.Protected(jwtService, userService), handler.GetTransactionById)
+	transactionGroup.Patch("/:id", middleware.Protected(jwtService, userService), handler.UpdatePaymentStatus)
+	transactionGroup.Delete("/:id", middleware.Protected(jwtService, userService), handler.DeleteTransaction)
 }

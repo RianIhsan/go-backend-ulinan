@@ -2,6 +2,7 @@ package service
 
 import (
 	"errors"
+	"time"
 	"ulinan/domain/cart"
 	"ulinan/domain/cart/dto"
 	"ulinan/domain/product"
@@ -64,12 +65,17 @@ func (s *CartService) AddCartItems(userId int, request *dto.AddCartItemsRequest)
 		return nil, errors.New("product not found")
 	}
 
+	arrivalDate, err := time.Parse("2006-01-02", request.ArrivalDate)
+	if err != nil {
+		return nil, errors.New("invalid arrival date format")
+	}
 	cartItem := &entities.CartItemEntity{
-		CartId:     carts.Id,
-		ProductId:  request.ProductID,
-		Quantity:   request.Quantity,
-		Price:      getProductByID.Price,
-		TotalPrice: getProductByID.Price * request.Quantity,
+		CartId:      carts.Id,
+		ProductId:   request.ProductID,
+		Quantity:    request.Quantity,
+		Price:       getProductByID.Price,
+		ArrivalDate: arrivalDate,
+		TotalPrice:  getProductByID.Price * request.Quantity,
 	}
 	result, err := s.repo.CreateCartItem(cartItem)
 	if err != nil {

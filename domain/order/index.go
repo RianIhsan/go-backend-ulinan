@@ -26,10 +26,12 @@ type OrderServiceInterface interface {
 	CancelPayment(orderID string) error
 	CallBack(notifPayload map[string]interface{}) error
 	GetAllOrdersByUserID(userID int) ([]*entities.OrderEntity, error)
+	CreateOrderFromCart(userID int, request *dto.TCreateOrderCartRequest, bank midtrans.Bank) (interface{}, error)
 }
 
 type OrderHandlerInterface interface {
 	CreateOrder(c *fiber.Ctx) error
+	CreateOrderFromCart(c *fiber.Ctx) error
 	GetAllOrdersByUserID(c *fiber.Ctx) error
 	Callback(c *fiber.Ctx) error
 }

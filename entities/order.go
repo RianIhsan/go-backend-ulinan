@@ -21,12 +21,13 @@ type OrderEntity struct {
 }
 
 type OrderDetailsEntity struct {
-	Id         int           `gorm:"column:id;primaryKey" json:"id"`
-	OrderId    string        `gorm:"column:order_id;type:VARCHAR(255)" json:"order_id"`
-	ProductId  int           `gorm:"column:product_id" json:"product_id"`
-	Quantity   int           `gorm:"column:quantity" json:"quantity"`
-	TotalPrice int           `gorm:"column:total_price" json:"total_price"`
-	Product    ProductEntity `json:"product,omitempty" gorm:"foreignKey:ProductId"`
+	Id          int           `gorm:"column:id;primaryKey" json:"id"`
+	OrderId     string        `gorm:"column:order_id;type:VARCHAR(255)" json:"order_id"`
+	ProductId   int           `gorm:"column:product_id" json:"product_id"`
+	Quantity    int           `gorm:"column:quantity" json:"quantity"`
+	TotalPrice  int           `gorm:"column:total_price" json:"total_price"`
+	ArrivalDate time.Time     `gorm:"column:arrival_date;type:TIMESTAMP" json:"arrival_date,omitempty"`
+	Product     ProductEntity `json:"product,omitempty" gorm:"foreignKey:ProductId"`
 }
 
 func (OrderEntity) TableName() string {

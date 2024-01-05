@@ -1,5 +1,7 @@
 package dto
 
+import "ulinan/entities"
+
 type TCreateOrderRequest struct {
 	ProductID     int    `json:"product_id" validate:"required"`
 	Quantity      int    `json:"quantity" validate:"required"`
@@ -19,4 +21,9 @@ type SendNotificationPaymentRequest struct {
 	UserName      string `json:"user_name"`
 	Title         string `json:"title"`
 	Body          string `json:"body"`
+}
+
+type TCreateOrderCartRequest struct {
+	PaymentMethod string                    `json:"payment_method" validate:"required"`
+	CartItems     []entities.CartItemEntity `json:"cart_items" validate:"required"`
 }

@@ -5,6 +5,7 @@ import (
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"
 	"ulinan/config"
+	hCart "ulinan/domain/cart/handler"
 	hUser "ulinan/domain/user/handler"
 	rUser "ulinan/domain/user/repository"
 	sUser "ulinan/domain/user/service"
@@ -30,11 +31,13 @@ import (
 
 	rCart "ulinan/domain/cart/repository"
 	sCart "ulinan/domain/cart/service"
-	// hCart "ulinan/domain/cart/handler"
-
 	hOrder "ulinan/domain/order/handler"
 	rOrder "ulinan/domain/order/repository"
 	sOrder "ulinan/domain/order/service"
+
+	hTransaction "ulinan/domain/transaction/handler"
+	rTransaction "ulinan/domain/transaction/repository"
+	sTransaction "ulinan/domain/transaction/service"
 )
 
 func main() {
@@ -77,11 +80,15 @@ func main() {
 
 	cartRepo := rCart.NewCartRepository(db)
 	cartService := sCart.NewCartService(cartRepo, productService)
-	// cartHandler := hCart.NewCartHandler(cartService)
+	cartHandler := hCart.NewCartHandler(cartService)
 
 	orderRepo := rOrder.NewOrderRepository(db, coreApi)
 	orderService := sOrder.NewOrderService(orderRepo, generatorID, productService, userService, cartService)
 	orderHandler := hOrder.NewOrderHandler(orderService)
+
+	transactionRepo := rTransaction.NewTransactionRepository(db)
+	transactionService := sTransaction.NewTransactionService(transactionRepo)
+	transactionHandler := hTransaction.NewTransactionHandler(transactionService)
 
 	app.Use(middleware.Logging())
 	app.Get("/", func(c *fiber.Ctx) error {
@@ -94,7 +101,9 @@ func main() {
 	routes.BootUserRoute(app, userHandler, jwt, userService)
 	routes.BootCategoryRoute(app, categoryHandler, jwt, userService)
 	routes.BootProductRouter(app, productHandler, jwt, userService)
+	routes.BootCartRouter(app, cartHandler, jwt, userService)
 	routes.BootOrderRouter(app, orderHandler, jwt, userService)
+	routes.BootTransactionRouter(app, transactionHandler, jwt, userService)
 
 	addr := fmt.Sprintf(":%d", bootConfig.AppPort)
 	if err := app.Listen(addr).Error(); err != addr {

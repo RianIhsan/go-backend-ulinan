@@ -39,7 +39,6 @@ func (h *OrderHandler) CreateOrder(c *fiber.Ctx) error {
 	switch payload.PaymentMethod {
 	case "bca":
 		bank = midtrans.BankBca
-	// Tambahkan bank lain sesuai kebutuhan
 	case "bri":
 		bank = midtrans.BankBri
 	case "bni":
@@ -66,7 +65,6 @@ func (h *OrderHandler) CreateOrder(c *fiber.Ctx) error {
 func (h *OrderHandler) Callback(c *fiber.Ctx) error {
 	var notificationPayload map[string]any
 
-	// Parse request body using Fiber's BodyParser
 	if err := c.BodyParser(&notificationPayload); err != nil {
 		return response.SendStatusBadRequest(c, "Format input yang Anda masukkan tidak sesuai")
 	}
@@ -91,4 +89,45 @@ func (h *OrderHandler) GetAllOrdersByUserID(c *fiber.Ctx) error {
 	}
 
 	return response.SendStatusOkWithDataResponse(c, "Berhasil mendapatkan pesanan", dto.FormatterGetAllOrderUser(orders))
+}
+
+func (h *OrderHandler) CreateOrderFromCart(c *fiber.Ctx) error {
+	currentUser, _ := c.Locals("CurrentUser").(*entities.UserEntity)
+	if currentUser.Role != "user" {
+		return response.SendStatusUnauthorized(c, "Access denied: you are admin, not user")
+	}
+	req := new(dto.TCreateOrderCartRequest)
+	if err := c.BodyParser(req); err != nil {
+		return response.SendStatusBadRequest(c, "invalid payload:"+err.Error())
+	}
+	if err := validator.ValidateStruct(req); err != nil {
+		return response.SendStatusBadRequest(c, "error validating payload:"+err.Error())
+	}
+
+	var bank midtrans.Bank
+	switch req.PaymentMethod {
+	case "bca":
+		bank = midtrans.BankBca
+	case "bri":
+		bank = midtrans.BankBri
+	case "bni":
+		bank = midtrans.BankBni
+	case "cimb":
+		bank = midtrans.BankCimb
+	default:
+		bank = midtrans.BankPermata
+	}
+
+	result, err := h.service.CreateOrderFromCart(currentUser.ID, req, bank)
+	if err != nil {
+		return response.SendStatusInternalServerError(c, "Gagal membuat pesanan dari keranjang: "+err.Error())
+	}
+
+	switch req.PaymentMethod {
+	case "qris", "bank_transfer", "bca", "bri", "bni", "cimb", "gopay":
+		return response.SendStatusCreatedWithDataResponse(c, "Berhasil membuat pesanan dengan payment gateway", result)
+	default:
+		return response.SendStatusBadRequest(c, "Metode pembayaran tidak valid: "+req.PaymentMethod)
+	}
+
 }
