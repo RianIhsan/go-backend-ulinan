@@ -10,7 +10,7 @@ type CartItemFormatter struct {
 	Price       int    `json:"price"`
 	Quantity    int    `json:"quantity"`
 	TotalPrice  int    `json:"total_price"`
-	ArrivalDate string `json:"arrival_date,omitempty"` // Tambahkan Arrival Date di sini
+	ArrivalDate string `json:"arrival_date"`
 }
 type CartFormatter struct {
 	ID         int                 `json:"id"`

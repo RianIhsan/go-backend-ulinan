@@ -261,17 +261,6 @@ func (s *OrderService) GetAllOrdersByUserID(userID int) ([]*entities.OrderEntity
 		return nil, err
 	}
 
-	// Iterate through orders and fetch related products for each order detail
-	for _, order := range orders {
-		for i, orderDetail := range order.OrderDetails {
-			product, err := s.productService.GetProductById(orderDetail.ProductId)
-			if err != nil {
-				return nil, errors.New("product not found")
-			}
-			order.OrderDetails[i].Product = *product
-		}
-	}
-
 	return orders, nil
 }
 
@@ -300,16 +289,13 @@ func (s *OrderService) CreateOrderFromCart(userID int, request *dto.TCreateOrder
 	}
 
 	var cartItems []*entities.CartItemEntity
-	var earliestArrivalDate time.Time
+
 	for _, itemID := range request.CartItems {
 		cartItem, err := s.cartService.GetCartItems(itemID.Id)
 		if err != nil {
 			return nil, errors.New("failed to get cart item")
 		}
 		cartItems = append(cartItems, cartItem)
-		if earliestArrivalDate.IsZero() || cartItem.ArrivalDate.Before(earliestArrivalDate) {
-			earliestArrivalDate = cartItem.ArrivalDate
-		}
 	}
 
 	var orderDetails []entities.OrderDetailsEntity
@@ -325,7 +311,7 @@ func (s *OrderService) CreateOrderFromCart(userID int, request *dto.TCreateOrder
 			ProductId:   cartItem.ProductId,
 			Quantity:    cartItem.Quantity,
 			TotalPrice:  cartItem.Quantity * products.Price,
-			ArrivalDate: earliestArrivalDate,
+			ArrivalDate: cartItem.ArrivalDate,
 		}
 		totalQuantity += cartItem.Quantity
 		totalPrice += orderDetail.TotalPrice
@@ -349,7 +335,7 @@ func (s *OrderService) CreateOrderFromCart(userID int, request *dto.TCreateOrder
 		OrderStatus:        "Pending",
 		PaymentStatus:      "Pending",
 		PaymentMethod:      request.PaymentMethod,
-		ArrivalDate:        earliestArrivalDate,
+		ArrivalDate:        cartItems[0].ArrivalDate,
 		CreatedAt:          time.Now(),
 		UpdatedAt:          time.Now(),
 	}

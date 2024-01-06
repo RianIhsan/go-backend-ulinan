@@ -58,7 +58,7 @@ func (r *CartRepository) GetCart(userID int) (*entities.CartEntity, error) {
 	carts := &entities.CartEntity{}
 	if err := r.db.
 		Preload("CartItems", func(db *gorm.DB) *gorm.DB {
-			return db.Select("id, cart_id, product_id, quantity, total_price").
+			return db.Select("id, cart_id, product_id, quantity, total_price, arrival_date").
 				Preload("Product", func(db *gorm.DB) *gorm.DB {
 					return db.Select("id, name, price").
 						Preload("ProductPhotos")
