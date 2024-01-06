@@ -91,7 +91,7 @@ func (r *CategoryRepository) CountCategoryByName(name string) (int64, error) {
 	var count int64
 	query := r.db.Model(&entities.CategoryEntity{}).Where("deleted_at IS NULL")
 	if name != "" {
-		query = query.Where("name LIKE ?", "%"+name+"%")
+		query = query.Where("LOWER(name) LIKE ?", "%"+strings.ToLower(name)+"%")
 	}
 	err := query.Count(&count).Error
 	return count, err

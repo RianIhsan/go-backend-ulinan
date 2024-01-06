@@ -23,7 +23,7 @@ func (r *ProductRepository) GetProductsByCategoryAndNameProduct(page, perPage, c
 		Limit(perPage)
 
 	if search != "" {
-		query = query.Where("name LIKE ?", "%"+search+"%")
+		query = query.Where("LOWER(name) LIKE ?", "%"+strings.ToLower(search)+"%")
 	}
 
 	err := query.Find(&products).Error
@@ -39,7 +39,7 @@ func (r *ProductRepository) CountProductByCategoryAndNameProduct(categoryID int,
 		Where("category_id = ? AND deleted_at IS NULL", categoryID)
 
 	if search != "" {
-		query = query.Where("name LIKE ?", "%"+search+"%")
+		query = query.Where("LOWER(name) LIKE ?", "%"+strings.ToLower(search)+"%")
 	}
 
 	err := query.Count(&count).Error
