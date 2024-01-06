@@ -42,13 +42,13 @@ func GetProductById(product *entities.ProductEntity) TCreateProductResponse {
 }
 
 type TGetAllProductsResponse struct {
-	ID          int      `json:"id"`
-	Name        string   `json:"name"`
-	Price       int      `json:"price"`
-	Category    string   `json:"category"`
-	Address     string   `json:"address"`
-	Description string   `json:"description"`
-	FirstImage  []string `json:"image"`
+	ID          int                     `json:"id"`
+	Name        string                  `json:"name"`
+	Price       int                     `json:"price"`
+	Category    string                  `json:"category"`
+	Address     string                  `json:"address"`
+	Description string                  `json:"description"`
+	Image       []ProductImageFormatter `json:"image"`
 }
 
 func GetAllProductsResponse(product *entities.ProductEntity) TGetAllProductsResponse {
@@ -60,14 +60,18 @@ func GetAllProductsResponse(product *entities.ProductEntity) TGetAllProductsResp
 	response.Address = product.Address
 	response.Category = product.Category.Name
 
-	if len(product.ProductPhotos) > 0 {
-		for _, photo := range product.ProductPhotos {
-			// Check if DeletedAt is nil
-			if photo.DeletedAt == nil {
-				response.FirstImage = append(response.FirstImage, photo.ImageURL)
+	var productImages []ProductImageFormatter
+	for _, productImage := range product.ProductPhotos {
+		if productImage.DeletedAt == nil {
+			image := ProductImageFormatter{
+				ID:  productImage.ID,
+				URL: productImage.ImageURL,
 			}
+			productImages = append(productImages, image)
 		}
 	}
+
+	response.Image = productImages
 
 	return response
 }
