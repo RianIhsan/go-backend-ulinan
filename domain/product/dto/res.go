@@ -60,7 +60,7 @@ func GetAllProductsResponse(product *entities.ProductEntity) TGetAllProductsResp
 	response.Address = product.Address
 	response.Category = product.Category.Name
 
-	if len(product.ProductPhotos) > 0 && product.ProductPhotos[0].DeletedAt == nil {
+	if len(product.ProductPhotos) > 0 {
 		response.FirstImage = product.ProductPhotos[0].ImageURL
 	}
 
