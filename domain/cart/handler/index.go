@@ -47,7 +47,7 @@ func (h *CartHandler) GetCart(c *fiber.Ctx) error {
 
 	cartItemSummary, err := h.service.GetCart(currentUser.ID)
 	if err != nil {
-		return response.SendStatusInternalServerError(c, "Gagal mendapatkan keranjang: "+err.Error())
+		return response.SendStatusNotFound(c, "Gagal mendapatkan keranjang: "+err.Error())
 	}
 
 	return response.SendStatusOkWithDataResponse(c, "Berhasil mendapatkan keranjang", dto.FormatCart(cartItemSummary))

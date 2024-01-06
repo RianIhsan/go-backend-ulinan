@@ -24,7 +24,7 @@ func NewCartService(repo cart.CartRepositoryInterface, productService product.Pr
 func (s *CartService) GetCart(userID int) (*entities.CartEntity, error) {
 	carts, err := s.repo.GetCart(userID)
 	if err != nil {
-		return nil, errors.New("cart not found")
+		return &entities.CartEntity{}, errors.New("cart not found")
 	}
 	return carts, nil
 }
