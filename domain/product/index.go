@@ -17,6 +17,7 @@ type ProductRepositoryInterface interface {
 	UpdateProduct(id int, updatedProduct *entities.ProductEntity) (*entities.ProductEntity, error)
 	DeleteProduct(id int) error
 	DeleteProductImage(productId, ImageId int) error
+	GetRandomProducts(count int) ([]*entities.ProductEntity, error)
 }
 
 type ProductServiceInterface interface {
@@ -31,12 +32,14 @@ type ProductServiceInterface interface {
 	UpdateProduct(id int, req *dto.TUpdateProductRequest) error
 	DeleteProduct(id int) error
 	DeleteProductImage(productId, ImageId int) error
+	GetRandomProducts(count int) ([]*entities.ProductEntity, error)
 }
 
 type ProductHandlerInterface interface {
 	CreateProduct(c *fiber.Ctx) error
 	GetProductById(c *fiber.Ctx) error
 	GetAllProducts(c *fiber.Ctx) error
+	GetRandomProducts(c *fiber.Ctx) error
 	CreateProductImage(c *fiber.Ctx) error
 	UpdateProduct(c *fiber.Ctx) error
 	DeleteProduct(c *fiber.Ctx) error

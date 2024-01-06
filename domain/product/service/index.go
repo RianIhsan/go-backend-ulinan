@@ -185,3 +185,11 @@ func (s *ProductService) DeleteProductImage(productId, ImageId int) error {
 
 	return nil
 }
+
+func (s *ProductService) GetRandomProducts(count int) ([]*entities.ProductEntity, error) {
+	products, err := s.repo.GetRandomProducts(count)
+	if err != nil {
+		return nil, errors.New("failed to get random products")
+	}
+	return products, nil
+}

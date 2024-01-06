@@ -121,3 +121,13 @@ func (r *ProductRepository) DeleteProductImage(productId, ImageId int) error {
 	}
 	return tx.Commit().Error
 }
+
+// GetRandomProducts retrieves multiple random products from the database.
+func (r *ProductRepository) GetRandomProducts(count int) ([]*entities.ProductEntity, error) {
+	var products []*entities.ProductEntity
+	err := r.db.Order("created_at desc").Limit(count).Where("deleted_at IS NULL").Preload("Category").Preload("ProductPhotos").Find(&products).Error
+	if err != nil {
+		return nil, err
+	}
+	return products, nil
+}

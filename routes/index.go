@@ -42,6 +42,7 @@ func BootProductRouter(app *fiber.App, handler product.ProductHandlerInterface, 
 	productGroup.Post("/", middleware.Protected(jwtService, userService), handler.CreateProduct)
 	productGroup.Post("/image", middleware.Protected(jwtService, userService), handler.CreateProductImage)
 	productGroup.Get("/", handler.GetAllProducts)
+	productGroup.Get("/random", handler.GetRandomProducts)
 	productGroup.Get("/:id", handler.GetProductById)
 	productGroup.Patch("/:id", middleware.Protected(jwtService, userService), handler.UpdateProduct)
 	productGroup.Delete("/:id", middleware.Protected(jwtService, userService), handler.DeleteProduct)

@@ -173,3 +173,11 @@ func (h *ProductHandler) DeleteProductImage(c *fiber.Ctx) error {
 
 	return response.SendStatusOkResponse(c, "product image deleted successfully")
 }
+
+func (h *ProductHandler) GetRandomProducts(c *fiber.Ctx) error {
+	products, err := h.productService.GetRandomProducts(8)
+	if err != nil {
+		return response.SendStatusBadRequest(c, "failed to get random products: "+err.Error())
+	}
+	return response.SendStatusOkWithDataResponse(c, "success get random products", dto.GetPaginationProducts(products))
+}
