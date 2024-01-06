@@ -193,3 +193,29 @@ func (s *ProductService) GetRandomProducts(count int) ([]*entities.ProductEntity
 	}
 	return products, nil
 }
+
+func (s *ProductService) GetProductByCategory(page, perPage, categoryId int) ([]*entities.ProductEntity, int64, error) {
+	products, err := s.repo.GetProductsByCategoryID(page, perPage, categoryId)
+	if err != nil {
+		return nil, 0, err
+	}
+	totalProducts, err := s.repo.CountTotalProductsByCategoryID(categoryId)
+	if err != nil {
+		return nil, 0, err
+	}
+	return products, totalProducts, nil
+}
+
+func (s *ProductService) GetProductsByCategoryAndNameProduct(page, perPage, categoryID int, search string) ([]*entities.ProductEntity, int64, error) {
+	products, err := s.repo.GetProductsByCategoryAndNameProduct(page, perPage, categoryID, search)
+	if err != nil {
+		return nil, 0, err
+	}
+
+	totalProducts, err := s.repo.CountProductByCategoryAndNameProduct(categoryID, search)
+	if err != nil {
+		return nil, 0, err
+	}
+
+	return products, totalProducts, nil
+}

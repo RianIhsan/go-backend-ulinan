@@ -12,6 +12,43 @@ type ProductRepository struct {
 	db *gorm.DB
 }
 
+func (r *ProductRepository) GetProductsByCategoryAndNameProduct(page, perPage, categoryID int, search string) ([]*entities.ProductEntity, error) {
+	var products []*entities.ProductEntity
+	offset := (page - 1) * perPage
+
+	query := r.db.Where("category_id = ? AND deleted_at IS NULL", categoryID).
+		Preload("Category").
+		Preload("ProductPhotos").
+		Offset(offset).
+		Limit(perPage)
+
+	if search != "" {
+		query = query.Where("name LIKE ?", "%"+search+"%")
+	}
+
+	err := query.Find(&products).Error
+	if err != nil {
+		return nil, err
+	}
+	return products, nil
+}
+
+func (r *ProductRepository) CountProductByCategoryAndNameProduct(categoryID int, search string) (int64, error) {
+	var count int64
+	query := r.db.Model(&entities.ProductEntity{}).
+		Where("category_id = ? AND deleted_at IS NULL", categoryID)
+
+	if search != "" {
+		query = query.Where("name LIKE ?", "%"+search+"%")
+	}
+
+	err := query.Count(&count).Error
+	if err != nil {
+		return 0, err
+	}
+	return count, nil
+}
+
 func NewProductRepository(db *gorm.DB) product.ProductRepositoryInterface {
 	return &ProductRepository{db}
 }
@@ -122,7 +159,6 @@ func (r *ProductRepository) DeleteProductImage(productId, ImageId int) error {
 	return tx.Commit().Error
 }
 
-// GetRandomProducts retrieves multiple random products from the database.
 func (r *ProductRepository) GetRandomProducts(count int) ([]*entities.ProductEntity, error) {
 	var products []*entities.ProductEntity
 	err := r.db.Order("created_at desc").Limit(count).Where("deleted_at IS NULL").Preload("Category").Preload("ProductPhotos").Find(&products).Error
@@ -130,4 +166,30 @@ func (r *ProductRepository) GetRandomProducts(count int) ([]*entities.ProductEnt
 		return nil, err
 	}
 	return products, nil
+}
+
+func (r *ProductRepository) GetProductsByCategoryID(page, perPage, categoryID int) ([]*entities.ProductEntity, error) {
+	var products []*entities.ProductEntity
+	offset := (page - 1) * perPage
+	err := r.db.Where("category_id = ? AND deleted_at IS NULL", categoryID).
+		Preload("Category").
+		Preload("ProductPhotos").
+		Offset(offset).
+		Limit(perPage).
+		Find(&products).Error
+	if err != nil {
+		return nil, err
+	}
+	return products, nil
+}
+
+func (r *ProductRepository) CountTotalProductsByCategoryID(categoryID int) (int64, error) {
+	var count int64
+	err := r.db.Model(&entities.ProductEntity{}).
+		Where("category_id = ? AND deleted_at IS NULL", categoryID).
+		Count(&count).Error
+	if err != nil {
+		return 0, err
+	}
+	return count, nil
 }

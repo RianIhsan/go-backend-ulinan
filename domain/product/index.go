@@ -18,6 +18,10 @@ type ProductRepositoryInterface interface {
 	DeleteProduct(id int) error
 	DeleteProductImage(productId, ImageId int) error
 	GetRandomProducts(count int) ([]*entities.ProductEntity, error)
+	GetProductsByCategoryID(page, perPage, categoryID int) ([]*entities.ProductEntity, error)
+	CountTotalProductsByCategoryID(categoryID int) (int64, error)
+	GetProductsByCategoryAndNameProduct(page, perPage, categoryID int, search string) ([]*entities.ProductEntity, error)
+	CountProductByCategoryAndNameProduct(categoryID int, search string) (int64, error)
 }
 
 type ProductServiceInterface interface {
@@ -33,6 +37,8 @@ type ProductServiceInterface interface {
 	DeleteProduct(id int) error
 	DeleteProductImage(productId, ImageId int) error
 	GetRandomProducts(count int) ([]*entities.ProductEntity, error)
+	GetProductByCategory(page, perPage, categoryId int) ([]*entities.ProductEntity, int64, error)
+	GetProductsByCategoryAndNameProduct(page, perPage, categoryID int, search string) ([]*entities.ProductEntity, int64, error)
 }
 
 type ProductHandlerInterface interface {

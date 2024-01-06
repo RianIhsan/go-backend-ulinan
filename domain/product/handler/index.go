@@ -58,26 +58,31 @@ func (h *ProductHandler) GetAllProducts(c *fiber.Ctx) error {
 	limit := c.Query("limit", "10")
 	limitInt, _ := strconv.Atoi(limit)
 	search := c.Query("search")
+	categoryID, _ := strconv.Atoi(c.Query("category_id", "0"))
 
 	var products []*entities.ProductEntity
 	var totalItems int64
 	var err error
 
-	if search != "" {
+	if search != "" && categoryID > 0 {
+		products, totalItems, err = h.productService.GetProductsByCategoryAndNameProduct(pageConv, limitInt, categoryID, search)
+	} else if categoryID > 0 {
+		products, totalItems, err = h.productService.GetProductByCategory(pageConv, limitInt, categoryID)
+	} else if search != "" {
 		products, totalItems, err = h.productService.GetProductByName(pageConv, limitInt, search)
 	} else if limit != "" {
 		products, totalItems, err = h.productService.GetAllProducts(pageConv, limitInt)
 	}
 
 	if err != nil {
-		return response.SendStatusInternalServerError(c, "failed to get categories: "+err.Error())
+		return response.SendStatusInternalServerError(c, "failed to get products: "+err.Error())
 	}
 
 	currentPage, totalPages := h.productService.CalculatePaginationValues(pageConv, int(totalItems), limitInt)
 	nextPage := h.productService.GetNextPage(currentPage, totalPages)
 	prevPage := h.productService.GetPrevPage(currentPage)
 
-	return response.SendPaginationResponse(c, dto.GetPaginationProducts(products), currentPage, totalPages, int(totalItems), nextPage, prevPage, "success get categories")
+	return response.SendPaginationResponse(c, dto.GetPaginationProducts(products), currentPage, totalPages, int(totalItems), nextPage, prevPage, "success get products")
 }
 
 func (h *ProductHandler) CreateProductImage(c *fiber.Ctx) error {
@@ -180,4 +185,28 @@ func (h *ProductHandler) GetRandomProducts(c *fiber.Ctx) error {
 		return response.SendStatusBadRequest(c, "failed to get random products: "+err.Error())
 	}
 	return response.SendStatusOkWithDataResponse(c, "success get random products", dto.GetPaginationProducts(products))
+}
+
+func (h *ProductHandler) GetProductByCategory(c *fiber.Ctx) error {
+	page, _ := strconv.Atoi(c.Query("page", "1"))
+	pageConv, _ := strconv.Atoi(strconv.Itoa(page))
+	limit := c.Query("limit", "10")
+	limitInt, _ := strconv.Atoi(limit)
+	categoryId, err := strconv.Atoi(c.Params("id"))
+	if err != nil {
+		return response.SendStatusBadRequest(c, "invalid category id")
+	}
+	var products []*entities.ProductEntity
+	var totalItems int64
+	products, totalItems, err = h.productService.GetProductByCategory(pageConv, limitInt, categoryId)
+
+	if err != nil {
+		return response.SendStatusInternalServerError(c, "failed to get categories: "+err.Error())
+	}
+
+	currentPage, totalPages := h.productService.CalculatePaginationValues(pageConv, int(totalItems), limitInt)
+	nextPage := h.productService.GetNextPage(currentPage, totalPages)
+	prevPage := h.productService.GetPrevPage(currentPage)
+
+	return response.SendPaginationResponse(c, dto.GetPaginationProducts(products), currentPage, totalPages, int(totalItems), nextPage, prevPage, "success get categories")
 }
