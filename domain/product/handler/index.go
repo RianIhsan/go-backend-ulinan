@@ -55,7 +55,7 @@ func (h *ProductHandler) GetProductById(c *fiber.Ctx) error {
 func (h *ProductHandler) GetAllProducts(c *fiber.Ctx) error {
 	page, _ := strconv.Atoi(c.Query("page", "1"))
 	pageConv, _ := strconv.Atoi(strconv.Itoa(page))
-	limit := c.Query("limit", "10")
+	limit := c.Query("limit", "99")
 	limitInt, _ := strconv.Atoi(limit)
 	search := c.Query("search")
 	categoryID, _ := strconv.Atoi(c.Query("category_id", "0"))
