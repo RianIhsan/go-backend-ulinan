@@ -14,7 +14,7 @@ Proyek ini adalah backend API untuk sistem pemesanan tiket wisata yang dibangun 
 
 4. **Midtrans**: Diperintahkan untuk menangani proses pembayaran. Midtrans adalah gateway pembayaran yang terintegrasi, memungkinkan aplikasi menerima pembayaran dengan berbagai metode pembayaran.
 
-5. **Cloudinary**: Digunakan sebagai penyimpanan awan untuk mengelola dan menyimpan file media, seperti gambar atau video terkait destinasi wisata.
+5. **Cloudinary**: Digunakan sebagai cloud storage untuk mengelola dan menyimpan file media, seperti gambar terkait destinasi wisata.
 
 6. **JWT (JSON Web Token)**: Digunakan untuk otentikasi dan otorisasi pengguna. JWT memberikan cara aman untuk mentransmisikan informasi otentikasi antara pihak-pihak yang terlibat.
 
@@ -26,4 +26,11 @@ Proyek ini adalah backend API untuk sistem pemesanan tiket wisata yang dibangun 
 4. Sesuaikan konfigurasi database Postgres dan API Midtrans di file konfigurasi.
 5. Jalankan aplikasi dengan perintah `go run main.go`.
 6. Backend API akan berjalan pada `http://localhost:8080` secara default.
+
+
+![Screenshot from 2024-01-08 01-36-50](https://github.com/RianIhsan/go-backend-ulinan/assets/93025581/e2695dae-bf77-4ba9-8988-fe730ec1ad70)
+![Screenshot from 2024-01-08 01-35-48](https://github.com/RianIhsan/go-backend-ulinan/assets/93025581/affcf7cb-ba31-493c-9c68-8d5ee3f6f7aa)
+![Screenshot from 2024-01-08 01-34-36](https://github.com/RianIhsan/go-backend-ulinan/assets/93025581/0c7f2a17-2551-4540-be35-fe0cb3288260)
+![Screenshot from 2024-01-08 01-34-26](https://github.com/RianIhsan/go-backend-ulinan/assets/93025581/0091009e-5aa8-456c-bba4-8e63dddbc546)
+
 
